@@ -9,25 +9,25 @@ morph = pymorphy2.MorphAnalyzer()
 necessary_part = {"NOUN", "ADJF", "ADJS", "VERB", "INFN", "PRTF", "PRTS", "GRND"}
 with open('text.txt', 'r', encoding='utf8') as f:
     text = f.read().split('\n')
-    res = []
+    sentences = []
 
     # Normalization
     for line in text:
-        res.append(text_to_word_sequence(line))
+        sentences.append(text_to_word_sequence(line))
 
-    for i in tqdm(range(len(res))):
-        res_lst = []
-        for el in res[i]:
+    for i in tqdm(range(len(sentences))):
+        sentence = []
+        for el in sentences[i]:
             p = morph.parse(el)[0]
             if p.tag.POS in necessary_part:
-                res_lst.append(p.normal_form)
-        res[i] = res_lst
-    res = [x for x in res if x]
+                sentence.append(p.normal_form)
+        sentences[i] = sentence
+    sentences = [x for x in sentences if x]
     model_name = 'my.model'
 
     # --------------------------
     # Training
-    model = gensim.models.FastText(res, size=300, window=3, min_count=2, sg=1, iter=35)
+    model = gensim.models.FastText(sentences, size=300, window=3, min_count=2, sg=1, iter=35)
 
     model.init_sims(replace=True)
 
